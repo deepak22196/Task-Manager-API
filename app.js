@@ -1,5 +1,7 @@
 require("./database/connect");
 const connectDB = require("./database/connect");
+const notFound = require("./middlewares/notFound");
+require("dotenv").config();
 const express = require("express");
 const app = express();
 
@@ -11,19 +13,17 @@ app.use(express.json());
 
 app.use("/api/v1/tasks", taskRouter);
 
-app.get("/hello", (req, res) => {
-  res.send("task manager app");
-});
+app.use(notFound);
 
 const start = async () => {
   try {
-    await connectDB();
+    await connectDB(process.env.MONGO_URI);
     app.listen(port, () => {
       console.log(`database connected successfully`);
       console.log(`server is listening on port ${port}`);
     });
   } catch (error) {
-    console.log("error connecting to database");
+    console.log("error connecting to database", error);
   }
 };
 
